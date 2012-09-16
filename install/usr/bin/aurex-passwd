@@ -1,0 +1,71 @@
+#!/bin/sh
+WIN_ICON="gtk-edit"
+WIN_TITLE="aurex-passwd"
+
+show_desktop(){
+	wmctrl -r "$WIN_TITLE" -k off
+}
+
+die(){
+	echo "$1"
+	exit 1
+}
+
+info(){
+	echo "$1"
+	exit 0
+}
+
+get_user_type(){
+	USER_TYPE="none"
+	NUM_USERS=$(getent passwd "$PASS_USER" |wc -l)
+	if [ "$NUM_USERS" ] && [ $NUM_USERS -gt 0 ] ; then
+		NUM_LOCAL_USERS=$(grep "^$PAS_USER:" /etc/passwd |wc -l)
+		if [ "$NUM_LOCAL_USERS" ] && [ $NUM_LOCAL_USERS -eq $NUM_USERS ] ; then
+			USER_TYPE="local"
+		else
+			USER_TYPE="net"
+		fi
+	fi
+	echo "$USER_TYPE"
+	return 0
+}
+
+PASS_USER="$(id -un)"
+USER_TYPE="$(get_user_type)"
+case $USER_TYPE in
+	local)
+		EXPECT_PASS_SCRIPT="/usr/share/aurex-ctrl-alt-del/local-passwd.expect"
+		;;
+	net)
+		EXPECT_PASS_SCRIPT="/usr/share/aurex-ctrl-alt-del/smb-passwd.expect"
+		;;
+	*)
+		die "Tipo de usuario desconocido"
+esac
+PASS_LINE=$(yad --form --title="$WIN_TITLE" --window-icon=$WIN_ICON --image=$WIN_ICON \
+ --on-top \
+ --center --width=440 --height=220 \
+ --field="Cambio de contraseña para el usuario $PASS_USER":LBL \
+ --field="Contraseña actual":H \
+ --field="Nueva contraseña":H \
+ --field="Verifique la nueva contraseña":H ) || exit 0
+
+PASS_LINE="${PASS_LINE#*|}"
+OLD_PAS="${PASS_LINE%%|*}"
+PASS_LINE="${PASS_LINE#*|}"
+NEW_PAS="${PASS_LINE%%|*}"
+PASS_LINE="${PASS_LINE#*|}"
+CONFIRM_PAS="${PASS_LINE%%|*}"
+[ "$OLD_PAS" -a "$NEW_PAS" -a "$CONFIRM_PAS" ] || die "No puede dejar contraseñas en blanco"
+[ "$NEW_PAS" = "$CONFIRM_PAS" ] || die "Los passwords no coinciden"
+
+OLD_LANG="$LANG"
+export LANG=C
+if printf "$PASS_USER\000${OLD_PAS}\000${NEW_PAS}" |xargs -0 $EXPECT_PASS_SCRIPT ; then
+	info "Contraseña cambiada correctamente"
+else
+	die "Contraseña no cambiada, se ha producido un error"
+fi
+exit 0
+

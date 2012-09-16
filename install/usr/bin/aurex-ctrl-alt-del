@@ -1,0 +1,89 @@
+#!/bin/sh
+WIN_ICON="media-playlist-repeat"
+WIN_TITLE="ctrl-alt-del"
+
+show_desktop(){
+	wmctrl -r "$WIN_TITLE" -k off
+}
+
+run_task_manager(){
+	case "$XDG_CURRENT_DESKTOP" in
+		XFCE)
+			TASK_TITLE="Administrador de tareas"
+			TASK_BINARY="xfce4-taskmanager"
+			;;
+		*)
+			# TODO: add gnome ...
+			;;
+	esac
+	if [ "$TASK_TITLE" ] ; then
+		# test if taskmanager is runnign
+		if  wmctrl -l |grep " $TASK_TITLE" ; then
+			wmctrl -a "$TASK_TITLE"
+			exit 0
+		fi
+	fi
+	if [ "$TASK_BINARY" ] ; then	
+		$TASK_BINARY &
+	fi
+	return 0
+}
+
+run_session_menu(){
+	case "$XDG_CURRENT_DESKTOP" in
+		XFCE)
+			SESSION_BINARY="xfce4-session-logout"
+			;;
+		*)
+			# TODO: add gnome ...
+			;;
+	esac
+	if [ "$SESSION_BINARY" ] ; then	
+		exec $TASK_BINARY
+	fi
+	return 0
+}
+
+run_screen_lock(){
+	if pidof xscreensaver 2>/dev/null >/dev/null ; then
+		exec xscreensaver-command -lock
+	elif pidof gnome-screensaver 2>/dev/null >/dev/null ; then
+		exec gnome-screensaver --lock
+	fi
+	return 0
+}
+
+run_password_change(){
+	exec aurex-passwd 
+	return 0
+}
+
+{ MAX_TIME=5; WAIT_TIME=1; TOTAL_TIME=0; while ! wmctrl -l |grep " ${WIN_TITLE}$" && [ $TOTAL_TIME -lt $MAX_TIME ] ; do sleep $WAIT_TIME ; TOTAL_TIME=$(( $TOTAL_TIME + $WAIT_TIME )); done; wmctrl -r "$WIN_TITLE" -k on; wmctrl -R "$WIN_TITLE" ; } &
+ACTION=$(yad --list --title="$WIN_TITLE" --window-icon=$WIN_ICON --image=$WIN_ICON \
+ --skip-taskbar --on-top  --undecorated --sticky --borders=16 \
+ --center --width=440 --height=220 \
+ --separator="" --hide-column=3 --print-column=3 --no-headers \
+ --column=icon:IMG --column=txt:TEXT --column=option:TEXT --column=@font@ \
+ lock "Bloquear Pantalla" lock "Ubuntu 12" \
+ gnome-log-out "Cerrar Sesión" session "Ubuntu 12" \
+ gtk-edit "Cambiar Contraseña" password "Ubuntu 12" \
+ gnome-run "Administrador de Tareas" task "Ubuntu 12") || true
+
+show_desktop
+case "$ACTION" in
+	lock)
+		run_screen_lock
+		;;
+	session) 
+		run_session_menu
+		;;
+	password)
+		run_password_change
+		;;
+	task)
+		run_task_manager
+		;;
+esac
+
+exit 0
+
