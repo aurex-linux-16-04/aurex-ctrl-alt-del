@@ -39,7 +39,7 @@ run_session_menu(){
 			;;
 	esac
 	if [ "$SESSION_BINARY" ] ; then	
-		exec $TASK_BINARY
+		exec $SESSION_BINARY
 	fi
 	return 0
 }
@@ -58,7 +58,7 @@ run_password_change(){
 	return 0
 }
 
-{ MAX_TIME=5; WAIT_TIME=1; TOTAL_TIME=0; while ! wmctrl -l |grep " ${WIN_TITLE}$" && [ $TOTAL_TIME -lt $MAX_TIME ] ; do sleep $WAIT_TIME ; TOTAL_TIME=$(( $TOTAL_TIME + $WAIT_TIME )); done; wmctrl -r "$WIN_TITLE" -k on; wmctrl -R "$WIN_TITLE" ; } &
+{ MAX_TIME=5; WAIT_TIME=1; TOTAL_TIME=0; while ! wmctrl -l |grep " ${WIN_TITLE}$" && [ $TOTAL_TIME -lt $MAX_TIME ] ; do sleep $WAIT_TIME ; TOTAL_TIME=$(( $TOTAL_TIME + $WAIT_TIME )); done; wmctrl -r "$WIN_TITLE" -k on; } &
 ACTION=$(yad --list --title="$WIN_TITLE" --window-icon=$WIN_ICON --image=$WIN_ICON \
  --skip-taskbar --on-top  --undecorated --sticky --borders=16 \
  --center --width=440 --height=220 \
