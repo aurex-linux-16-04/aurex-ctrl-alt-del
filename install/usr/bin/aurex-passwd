@@ -20,7 +20,7 @@ get_user_type(){
 	USER_TYPE="none"
 	NUM_USERS=$(getent passwd "$PASS_USER" |wc -l)
 	if [ "$NUM_USERS" ] && [ $NUM_USERS -gt 0 ] ; then
-		NUM_LOCAL_USERS=$(grep "^$PAS_USER:" /etc/passwd |wc -l)
+		NUM_LOCAL_USERS=$(grep "^$PASS_USER:" /etc/passwd |wc -l)
 		if [ "$NUM_LOCAL_USERS" ] && [ $NUM_LOCAL_USERS -eq $NUM_USERS ] ; then
 			USER_TYPE="local"
 		else
