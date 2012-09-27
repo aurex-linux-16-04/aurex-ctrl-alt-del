@@ -7,11 +7,9 @@ Standards-Version: 3.9.3
 
 Package: aurex-ctrl-alt-del
 Architecture: all
-Depends: ${misc:Depends}, yad, passwd, samba-common-bin, expect, wmctrl
+Depends: ${misc:Depends}, yad, aurex-passwd, wmctrl
 Description: ctrl-alt-del menu for aurex
  ctrl-alt-del shows a simple menu to allow desktop users to
  lock screen, close session, change password or run task manager.
  The intended use is to associate the program with ctrl-alt-del shortcut
- like other second-calss desktop environments.
- Network password change is supported via external script (look 
- package 'aurex-auth' for a samba password example)
+ like other 'second-class' desktop environments.
