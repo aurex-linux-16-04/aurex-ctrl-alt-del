@@ -1,3 +1,9 @@
+aurex-ctrl-alt-del (0.2) precise; urgency=low
+
+  * Minor fixes
+
+ -- Luis Antonio Garcia Gisbert <luisgg@gmail.com>  Thu, 27 Sep 2012 08:22:26 +0200
+
 aurex-ctrl-alt-del (0.1) precise; urgency=low
 
   * Initial release
