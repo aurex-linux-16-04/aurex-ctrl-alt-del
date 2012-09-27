@@ -1,3 +1,9 @@
+aurex-ctrl-alt-del (0.3) precise; urgency=low
+
+  * Some files moved to new binary package: aurex-passwd
+
+ -- Luis Antonio Garcia Gisbert <luisgg@gmail.com>  Fri, 28 Sep 2012 00:38:11 +0200
+
 aurex-ctrl-alt-del (0.2) precise; urgency=low
 
   * Minor fixes
